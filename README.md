@@ -1,6 +1,6 @@
 # Multi-View Graph Convolutional Recurrent Networks for Parking Demand Forecasting in Virtual Parking Lots
 
-This is a PyTorch implementation of [Multi-View Graph Convolutional Recurrent Networks for Parking Demand Forecasting in Virtual Parking Lots].
+This is a PyTorch implementation of Multi-View Graph Convolutional Recurrent Networks for Parking Demand Forecasting in Virtual Parking Lots.
 
 ## Table of Contents
 
