@@ -105,22 +105,22 @@ def get_dataloader(args, normalizer = 'std', tod=False, dow=False, weather=False
     day_in_week = np.tile(day_in_week, [1, N, 1]).transpose((2, 1, 0))
     feature_list.append(day_in_week)
 
-    # data = np.concatenate(feature_list, axis=-1)
-    x, y = Add_Window_Horizon(data, args.lag, args.horizon, single)
-    x_day, y_day = Add_Window_Horizon(time_in_day, args.lag, args.horizon, single)
-    x_week, y_week = Add_Window_Horizon(day_in_week, args.lag, args.horizon, single)
-    x, y = np.concatenate([x, x_day, x_week], axis=-1), np.concatenate([y, y_day, y_week], axis=-1)
-
-    # spilit dataset by days or by ratio
+    # Split the raw timeline first; windows must stay inside each split.
+    # Calendar features were computed above on the original global timeline.
+    data = np.concatenate(feature_list, axis=-1)
     if args.test_ratio > 1:
-        x_train, x_val, x_test = split_data_by_days(x, args.val_ratio, args.test_ratio)
-        y_train, y_val, y_test = split_data_by_days(y, args.val_ratio, args.test_ratio)
-        # day_train, day_val, day_test = split_data_by_days(time_in_day, args.val_ratio, args.test_ratio)
-        # week_train, week_val, week_test = split_data_by_days(day_in_week, args.val_ratio, args.test_ratio)
+        data_train, data_val, data_test = split_data_by_days(
+            data, args.val_ratio, args.test_ratio)
     else:
-        x_train, x_val, x_test = split_data_by_ratio(x, args.val_ratio, args.test_ratio)
-        y_train, y_val, y_test = split_data_by_ratio(y, args.val_ratio, args.test_ratio)
-        # week_train, week_val, week_test = split_data_by_ratio(day_in_week, args.val_ratio, args.test_ratio)
+        data_train, data_val, data_test = split_data_by_ratio(
+            data, args.val_ratio, args.test_ratio)
+
+    x_train, y_train = Add_Window_Horizon(
+        data_train, args.lag, args.horizon, single)
+    x_val, y_val = Add_Window_Horizon(
+        data_val, args.lag, args.horizon, single)
+    x_test, y_test = Add_Window_Horizon(
+        data_test, args.lag, args.horizon, single)
     # #normalize st data
     scaler = normalize_dataset(x_train[..., :args.input_dim], normalizer, args.column_wise)
     # # scaler1 = normalize_dataset(data_val, normalizer, args.column_wise)
